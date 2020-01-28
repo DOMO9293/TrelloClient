@@ -23,28 +23,36 @@ const Mypage = () => {
 
   const logout = async () => {
     console.log(token);
-    await localStorage.removeItem('token');
-    preload();
+    try {
+      await localStorage.removeItem('token');
+      preload();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const preload = async () => {
-    if (!isCancelled.current) {
-      if (localStorage.getItem('token')) {
-        setLoggedin(true);
-        const userToken = await localStorage.getItem('token');
-        const userId = await localStorage.getItem('userId');
-        console.log(userToken);
-        setToken(userToken);
+    try {
+      if (!isCancelled.current) {
+        if (localStorage.getItem('token')) {
+          setLoggedin(true);
+          const userToken = await localStorage.getItem('token');
+          const userId = await localStorage.getItem('userId');
+          console.log(userToken);
+          setToken(userToken);
 
-        const datausers = await serverApi.getUser(userToken, userId);
+          const datausers = await serverApi.getUser(userToken, userId);
 
-        setValue1(datausers.data.email);
-        setValue3(datausers.data.userName);
+          setValue1(datausers.data.email);
+          setValue3(datausers.data.userName);
 
-        console.log('ciomein', datausers);
-      } else {
-        setLoggedin(false);
+          console.log('ciomein', datausers);
+        } else {
+          setLoggedin(false);
+        }
       }
+    } catch (e) {
+      console.log(e);
     }
   };
   useEffect(() => {

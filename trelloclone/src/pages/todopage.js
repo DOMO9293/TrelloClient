@@ -42,51 +42,63 @@ const Todopage = ({ match }) => {
   const [boardchangeInput, setBoardchangeInput] = useState('');
 
   const addList = async e => {
-    console.log('이름이요', e.target);
-    if (e.target.value) {
-      await serverApi.addList(token, newList, match.params.boardid);
-      setNewlist('');
-      preload();
+    try {
+      if (e.target.value) {
+        await serverApi.addList(token, newList, match.params.boardid);
+        setNewlist('');
+        preload();
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
-  const addTodo = async (e, listid, index) => {
-    console.log('이름이요', e.target.value);
-    if (e.target.value) {
-      await serverApi.addTodo(
-        token,
-        e.target.value,
-        match.params.boardid,
-        listid
-      );
+  const addTodo = async (e, listid) => {
+    try {
+      if (e.target.value) {
+        await serverApi.addTodo(
+          token,
+          e.target.value,
+          match.params.boardid,
+          listid
+        );
 
-      const newTodos = [...lists];
+        const newTodos = [...lists];
 
-      console.log(newTodos);
+        console.log(newTodos);
 
-      newTodos.map(listt => {
-        console.log('dkdkdk', listid);
-        console.log('dkdkdk11', listt.id);
-        if (listt.id === listid) {
-          listt.newTodo = '';
-        }
-      });
-      setLists(newTodos);
+        newTodos.map(listt => {
+          console.log('dkdkdk', listid);
+          console.log('dkdkdk11', listt.id);
+          if (listt.id === listid) {
+            listt.newTodo = '';
+          }
+        });
+        setLists(newTodos);
 
-      preload();
+        preload();
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const deleteTodo = async (todoid, listid) => {
-    console.log('hihihsdf', todoid, listid);
-    await serverApi.deleteTodo(token, todoid, listid, match.params.boardid);
-    preload();
+    try {
+      await serverApi.deleteTodo(token, todoid, listid, match.params.boardid);
+      preload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const deleteList = async listid => {
-    console.log('리스트', listid);
-    await serverApi.deleteList(token, listid, match.params.boardid);
-    preload();
+    try {
+      await serverApi.deleteList(token, listid, match.params.boardid);
+      preload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const modifyTodo = (todoid, listid, todo, index) => {
@@ -114,17 +126,21 @@ const Todopage = ({ match }) => {
 
     setLists(newListn);
 
-    if (inputvalue) {
-      await serverApi.changeTodo(
-        token,
-        inputvalue,
-        todoid,
-        match.params.boardid,
-        listid
-      );
-    }
+    try {
+      if (inputvalue) {
+        await serverApi.changeTodo(
+          token,
+          inputvalue,
+          todoid,
+          match.params.boardid,
+          listid
+        );
+      }
 
-    preload();
+      preload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const modifylist = (e, listid, index) => {
@@ -151,25 +167,36 @@ const Todopage = ({ match }) => {
 
     setLists(newListn);
 
-    if (inputvalue) {
-      await serverApi.changeTodo(
-        token,
-        inputvalue,
-        match.params.boardid,
-        listid
-      );
-    }
+    try {
+      if (inputvalue) {
+        await serverApi.changeTodo(
+          token,
+          inputvalue,
+          match.params.boardid,
+          listid
+        );
+      }
 
-    preload();
+      preload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const boardnamechange = async e => {
-    setBoardchangeInput();
-    console.log('name', boardchangeInput);
-    setBoardclicked(true);
-    setBoardchangeInput('');
-    await serverApi.changeBoard(token, match.params.boardid, boardchangeInput);
-    preload();
+    try {
+      setBoardclicked(true);
+
+      await serverApi.changeBoard(
+        token,
+        match.params.boardid,
+        boardchangeInput
+      );
+      setBoardchangeInput('');
+      preload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const changetodo = e => {
@@ -181,22 +208,29 @@ const Todopage = ({ match }) => {
   };
 
   const preload = async () => {
-    if (localStorage.getItem('token')) {
-      const userToken = await localStorage.getItem('token');
-      setToken(userToken);
+    try {
+      if (localStorage.getItem('token')) {
+        const userToken = await localStorage.getItem('token');
+        setToken(userToken);
 
-      const userId = await localStorage.getItem('userId');
-      const dataLists = await serverApi.getLists(
-        userToken,
-        match.params.boardid
-      );
+        const userId = await localStorage.getItem('userId');
+        const dataLists = await serverApi.getLists(
+          userToken,
+          match.params.boardid
+        );
 
-      const board = await serverApi.getBoardn(userToken, match.params.boardid);
-      console.log('hihihi', board);
+        const board = await serverApi.getBoardn(
+          userToken,
+          match.params.boardid
+        );
+        console.log('hihihi', board);
 
-      setBoardn(board.data[0].board_name);
-      console.log('hihihi', dataLists);
-      setLists(dataLists.data);
+        setBoardn(board.data[0].board_name);
+        console.log('hihihi', dataLists);
+        setLists(dataLists.data);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

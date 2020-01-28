@@ -37,10 +37,15 @@ const Mainpage = () => {
 
   const addboard = async e => {
     console.log('이름이요', e.key);
-    if (e.target.value && e.key === 'Enter') {
-      await serverApi.addBoard(token, e.target.value);
-      setNewboardname('');
-      preload();
+
+    try {
+      if (e.target.value && e.key === 'Enter') {
+        await serverApi.addBoard(token, e.target.value);
+        setNewboardname('');
+        preload();
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -49,31 +54,33 @@ const Mainpage = () => {
   };
 
   const preload = async () => {
-    if (localStorage.getItem('token')) {
-      setLoggedin(true);
-      const userToken = await localStorage.getItem('token');
-      console.log(userToken);
-      setToken(userToken);
+    try {
+      if (localStorage.getItem('token')) {
+        setLoggedin(true);
+        const userToken = await localStorage.getItem('token');
+        console.log(userToken);
+        setToken(userToken);
 
-      const dataBoards = await serverApi.getBoards(userToken);
+        const dataBoards = await serverApi.getBoards(userToken);
 
-      console.log('hihihi', dataBoards);
-      setBoards(dataBoards.data);
-    } else {
-      setLoggedin(false);
+        console.log('hihihi', dataBoards);
+        setBoards(dataBoards.data);
+      } else {
+        setLoggedin(false);
+      }
+    } catch (e) {
+      console.log(e);
     }
-  };
-
-  const logout = async () => {
-    console.log(token);
-    await localStorage.removeItem('token');
-    preload();
   };
 
   const deleteBoard = async boardid => {
     console.log('보드', boardid);
-    await serverApi.deleteBoard(token, boardid);
-    preload();
+    try {
+      await serverApi.deleteBoard(token, boardid);
+      preload();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const nextpage = boardid => {
