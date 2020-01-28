@@ -7,7 +7,8 @@ import {
   ModalFooter,
   Container,
   Row,
-  Col
+  Col,
+  Alert
 } from 'reactstrap';
 import { serverApi } from '../components/api';
 import { Link, Redirect } from 'react-router-dom';
@@ -15,6 +16,7 @@ import { Link, Redirect } from 'react-router-dom';
 const Signup = () => {
   const [loggedin, setLoggedin] = useState(false);
   const [clicked, setclicked] = useState(false);
+  const [alerton, setAlerton] = useState(false);
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
   const [value3, setValue3] = useState('');
@@ -31,11 +33,19 @@ const Signup = () => {
     preload();
   }, []);
 
+  const onDismiss = () => setAlerton(false);
+
   const getresult = () => {
     if (value1 && value2 && value3) {
       serverApi.signUp(value1, value2, value3).then(data => {
         console.log(data);
-        setclicked(!clicked);
+        if (data.data === 'email already exists!') {
+          console.log('imin');
+          setAlerton(true);
+        } else {
+          setclicked(!clicked);
+        }
+
         //preload();
       });
     }
@@ -56,6 +66,9 @@ const Signup = () => {
   };
   return !loggedin || !clicked ? (
     <div>
+      <Alert color="info" isOpen={alerton} toggle={onDismiss}>
+        회원가입에 실패했습니다
+      </Alert>
       <Modal isOpen={clicked} toggle={toggle}>
         <ModalBody>회원가입이 완료되었습니다.</ModalBody>
         <ModalFooter>
@@ -101,11 +114,18 @@ const Signup = () => {
             width: 400,
             margin: 30,
             alignContent: 'center',
-            marginLeft: 180
+            marginLeft: 110
           }}
         >
-          <Button content="Click Here" onClick={getresult}>
+          <Button
+            content="Click Here"
+            style={{ margin: 20 }}
+            onClick={getresult}
+          >
             회원가입
+          </Button>
+          <Button content="Click Here" style={{ margin: 20 }} href="/">
+            돌아가기
           </Button>
         </Row>
       </Container>
