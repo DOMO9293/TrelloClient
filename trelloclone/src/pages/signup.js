@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Container, Row, Col } from 'reactstrap';
+import {
+  Input,
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  Container,
+  Row,
+  Col
+} from 'reactstrap';
 import { serverApi } from '../components/api';
 import { Link, Redirect } from 'react-router-dom';
 
-const Login = () => {
-  const [loggedin, setLoggedin] = useState(null);
+const Signup = () => {
+  const [loggedin, setLoggedin] = useState(false);
+  const [clicked, setclicked] = useState(false);
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
+  const [value3, setValue3] = useState('');
 
   const preload = async () => {
+    console.log('isit', clicked);
     if (localStorage.getItem('token')) {
       setLoggedin(true);
     } else {
@@ -20,17 +32,17 @@ const Login = () => {
   }, []);
 
   const getresult = () => {
-    console.log('hkhk');
-    serverApi.logIn(value1, value2).then(data => {
-      console.log('hkhk', data);
-      if (data.data !== 'login failed') {
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('userId', data.data.userId);
-        preload();
-      } else {
-        console.log('error');
-      }
-    });
+    if (value1 && value2 && value3) {
+      serverApi.signUp(value1, value2, value3).then(data => {
+        console.log(data);
+        setclicked(!clicked);
+        //preload();
+      });
+    }
+  };
+
+  const toggle = () => {
+    setclicked(!clicked);
   };
 
   const changevalue1 = e => {
@@ -39,16 +51,25 @@ const Login = () => {
   const changevalue2 = e => {
     setValue2(e.target.value);
   };
-  return !loggedin ? (
+  const changevalue3 = e => {
+    setValue3(e.target.value);
+  };
+  return !loggedin || !clicked ? (
     <div>
+      <Modal isOpen={clicked} toggle={toggle}>
+        <ModalBody>회원가입이 완료되었습니다.</ModalBody>
+        <ModalFooter>
+          <Button href="/">돌아가기</Button>
+        </ModalFooter>
+      </Modal>
       <Container style={{ marginLeft: 100 }}>
-        <Row style={{ width: 400, margin: 30, marginLeft: 170 }}>
-          <h1 style={{ textAlign: 'justify' }}>로그인</h1>
+        <Row style={{ width: 400, margin: 30, marginLeft: 150 }}>
+          <h1 style={{ textAlign: 'justify' }}>회원가입</h1>
         </Row>
         <Row style={{ width: 400, margin: 30 }}>
           <Input
             type="email"
-            id="makenewboard1"
+            id="makenewboard"
             name="boardname"
             placeholder="이메일"
             value={value1}
@@ -65,22 +86,25 @@ const Login = () => {
             onChange={changevalue2}
           />
         </Row>
+        <Row style={{ width: 400, margin: 30 }}>
+          <Input
+            type="text"
+            id="makenewboard"
+            name="boardname"
+            placeholder="이름"
+            value={value3}
+            onChange={changevalue3}
+          />
+        </Row>
         <Row
           style={{
             width: 400,
             margin: 30,
             alignContent: 'center',
-            marginLeft: 120
+            marginLeft: 180
           }}
         >
-          <Button
-            content="Click Here"
-            onClick={getresult}
-            style={{ margin: 20 }}
-          >
-            로그인
-          </Button>
-          <Button href="/signup" style={{ margin: 20 }}>
+          <Button content="Click Here" onClick={getresult}>
             회원가입
           </Button>
         </Row>
@@ -91,4 +115,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

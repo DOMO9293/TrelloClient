@@ -7,7 +7,15 @@ import {
   CardSubtitle,
   CardBody,
   CardLink,
-  Input
+  Input,
+  Container,
+  Row,
+  Col,
+  Nav,
+  NavItem,
+  Badge,
+  CardColumns,
+  CardHeader
 } from 'reactstrap';
 import { serverApi } from '../components/api';
 import Login from './login';
@@ -25,14 +33,19 @@ const Mainpage = () => {
   const [boards, setBoards] = useState(null);
   const [token, setToken] = useState(null);
   const [boardname, setBoardname] = useState(null);
+  const [newboardname, setNewboardname] = useState('');
 
   const addboard = async e => {
-    setBoardname(e.target.value);
-    console.log('이름이요', boardname);
-    if (e.target.value) {
+    console.log('이름이요', e.key);
+    if (e.target.value && e.key === 'Enter') {
       await serverApi.addBoard(token, e.target.value);
+      setNewboardname('');
       preload();
     }
+  };
+
+  const setValue = e => {
+    setNewboardname(e.target.value);
   };
 
   const preload = async () => {
@@ -74,38 +87,56 @@ const Mainpage = () => {
 
   return loggedin ? (
     <div>
-      <Button onClick={logout}>로그아웃</Button>
       {boards && (
-        <div>
-          {boards.map(data => {
-            return (
-              <Card
-                key={data.id}
-                onClick={() => {
-                  console.log('clicked');
-                  nextpage(data.id);
-                }}
-              >
-                <CardLink href={`${data.id}/list`}>{data.board_name}</CardLink>
-                <CardSubtitle>{data.createdAt.slice(0, 10)}</CardSubtitle>
-                <Button
+        <Row style={{ marginTop: 10 }}>
+          <CardColumns>
+            {boards.map(data => {
+              return (
+                <Card
+                  style={{ height: 100, width: 200 }}
+                  body
+                  inverse
+                  color="info"
+                  key={data.id}
                   onClick={() => {
-                    deleteBoard(data.id);
+                    console.log('clicked');
+                    nextpage(data.id);
                   }}
                 >
-                  보드삭제
-                </Button>
-              </Card>
-            );
-          })}
-          <Input
-            type="text"
-            id="makenewboard"
-            name="boardname"
-            placeholder="새로운 보드 생성"
-            onClick={addboard}
-          />
-        </div>
+                  <Row style={{ marginTop: -20 }}>
+                    <Button
+                      close
+                      onClick={() => {
+                        deleteBoard(data.id);
+                      }}
+                      style={{ color: 'black', marginLeft: 170 }}
+                    />
+                  </Row>
+                  <Row style={{ marginTop: 45 }}>
+                    <CardLink
+                      href={`${data.id}/list`}
+                      style={{ color: 'black', marginLeft: 3 }}
+                    >
+                      {data.board_name}
+                    </CardLink>
+                  </Row>
+                </Card>
+              );
+            })}
+            <Card body color="info" style={{ width: 200, height: 100 }}>
+              <Input
+                style={{ marginTop: 30 }}
+                type="text"
+                id="makenewboard"
+                name="boardname"
+                placeholder="+ 새로운 보드 생성"
+                value={newboardname}
+                onKeyPress={addboard}
+                onChange={setValue}
+              />
+            </Card>
+          </CardColumns>
+        </Row>
       )}
     </div>
   ) : (

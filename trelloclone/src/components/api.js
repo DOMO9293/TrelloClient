@@ -12,8 +12,30 @@ export const serverApi = {
       email: id,
       password: ps
     }),
+  signUp: (id, ps, username) =>
+    Api.post('users/signup', {
+      email: id,
+      password: ps,
+      userName: username
+    }),
+  getUser: (usertoken, id) =>
+    Api.get(`users/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Headers': 'x-access-token',
+        'x-access-token': usertoken
+      }
+    }),
   getBoards: usertoken =>
     Api.get('boards/', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Headers': 'x-access-token',
+        'x-access-token': usertoken
+      }
+    }),
+  getBoardn: (usertoken, boardid) =>
+    Api.get(`boards/${boardid}`, {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Headers': 'x-access-token',
@@ -126,6 +148,36 @@ export const serverApi = {
         todoId: todoid,
         boardId: boardid,
         listId: listid
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Headers': 'x-access-token',
+          'x-access-token': usertoken
+        }
+      }
+    ),
+  changeBoard: (usertoken, boardid, board_name) =>
+    Api.post(
+      `boards/${boardid}/modify`,
+      {
+        boardId: boardid,
+        board_name: board_name
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Headers': 'x-access-token',
+          'x-access-token': usertoken
+        }
+      }
+    ),
+  changeUser: (usertoken, userName, password) =>
+    Api.post(
+      `users/modify`,
+      {
+        password: password,
+        userName: userName
       },
       {
         headers: {
